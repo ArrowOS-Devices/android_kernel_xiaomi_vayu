@@ -167,7 +167,7 @@ int32_t ultrasound_apr_set_parameter(int32_t port_id, uint32_t param_id,
 	u8 *user_params, int32_t length) {
 
 	int32_t  ret = 0;
-	uint32_t module_id;
+	uint32_t module_id = 0;
 
 	if (port_id == ELLIPTIC_PORT_ID)
 		module_id = ELLIPTIC_ULTRASOUND_MODULE_TX;
