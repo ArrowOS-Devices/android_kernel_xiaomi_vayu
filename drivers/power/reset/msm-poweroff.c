@@ -67,6 +67,7 @@ static void scm_disable_sdi(void);
  */
 static int download_mode = 1;
 static bool force_warm_reboot;
+static int in_panic;
 
 static int in_panic;
 
