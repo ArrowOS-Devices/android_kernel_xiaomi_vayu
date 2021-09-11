@@ -2271,6 +2271,11 @@ bool ufs_qcom_check_phy_state(struct ufs_hba *hba)
 	return !phy->power_count && !ufs_qcom_phy_ref_clk_enabled(phy);
 }
 
+static u32 ufs_qcom_get_user_cap_mode(struct ufs_hba *hba)
+{
+	return UFS_WB_BUFF_PRESERVE_USER_SPACE;
+}
+
 /**
  * struct ufs_hba_qcom_vops - UFS QCOM specific variant operations
  *
@@ -2297,6 +2302,7 @@ static struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
 #ifdef CONFIG_DEBUG_FS
 	.add_debugfs		= ufs_qcom_dbg_add_debugfs,
 #endif
+	.get_user_cap_mode	= ufs_qcom_get_user_cap_mode,
 };
 
 static struct ufs_hba_variant ufs_hba_qcom_variant = {
