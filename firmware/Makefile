@@ -10,6 +10,11 @@ fwabs := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
 
 fw-external-y := $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE))
 
+fw-shipped-$(CONFIG_TOUCHSCREEN_NT36xxx) += j20s_novatek_ts_fw01.bin
+fw-shipped-$(CONFIG_TOUCHSCREEN_NT36xxx) += j20s_novatek_ts_mp01.bin
+fw-shipped-$(CONFIG_TOUCHSCREEN_NT36xxx) += j20s_novatek_ts_fw02.bin
+fw-shipped-$(CONFIG_TOUCHSCREEN_NT36xxx) += j20s_novatek_ts_mp02.bin
+
 fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
 quiet_cmd_ihex  = IHEX    $@
       cmd_ihex  = $(OBJCOPY) -Iihex -Obinary $< $@
