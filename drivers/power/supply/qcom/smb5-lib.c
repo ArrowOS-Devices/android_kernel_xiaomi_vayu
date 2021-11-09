@@ -895,6 +895,17 @@ int smblib_set_fastcharge_mode(struct smb_charger *chg, bool enable)
 	if (!chg->bms_psy)
 		return 0;
 
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+	rc = power_supply_get_property(chg->bms_psy,
+				POWER_SUPPLY_PROP_AUTHENTIC, &pval);
+	if (rc < 0) {
+		smblib_err(chg, "Couldn't get battery authentic:%d\n", rc);
+		return rc;
+	}
+	if (!pval.intval)
+		enable = false;
+#endif
+
 	/*if soc > 95 do not set fastcharge flag*/
 	rc = power_supply_get_property(chg->bms_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &pval);
@@ -959,6 +970,32 @@ set_term:
 
 	return 0;
 }
+
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+static void smblib_check_batt_authentic(struct smb_charger *chg)
+{
+	int rc = 0;
+	int authen_result = -1;
+	union power_supply_propval pval = {0,};
+	if (chg->batt_verify_psy && chg->bms_psy) {
+		rc = power_supply_get_property(chg->bms_psy,
+			POWER_SUPPLY_PROP_AUTHENTIC, &pval);
+		if (!rc)
+			authen_result = pval.intval;
+		pr_err("authen_result: %d\n", authen_result);
+		if (!authen_result) {
+			pval.intval = 1;
+			rc = power_supply_set_property(chg->batt_verify_psy,
+					POWER_SUPPLY_PROP_AUTHENTIC, &pval);
+			if (rc)
+				pr_err("set batt_verify authentic prop failed: %d\n",
+						rc);
+		}
+		/* notify smblib_notifier_call to reset BATT_VERIFY_VOTER fcc voter */
+		power_supply_changed(chg->bms_psy);
+	}
+}
+#endif
 
 static int smblib_usb_pd_adapter_allowance_override(struct smb_charger *chg,
 					u8 allowed_voltage)
@@ -1457,6 +1494,10 @@ static int smblib_notifier_call(struct notifier_block *nb,
 		if (!chg->bms_psy)
 			chg->bms_psy = psy;
 		if (ev == PSY_EVENT_PROP_CHANGED) {
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+			if (!chg->batt_verified)
+				schedule_delayed_work(&chg->batt_verify_update_work, 0);
+#endif
 			schedule_work(&chg->bms_update_work);
 		}
 	}
@@ -7104,6 +7145,10 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 		if (rc < 0)
 			smblib_err(chg, "Couldn't to enable DPDM rc=%d\n", rc);
 
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+		smblib_check_batt_authentic(chg);
+#endif
+
 		/* Enable SW Thermal regulation */
 		rc = smblib_set_sw_thermal_regulation(chg, true);
 		if (rc < 0)
@@ -10413,6 +10458,9 @@ int smblib_init(struct smb_charger *chg)
 
 		chg->bms_psy = power_supply_get_by_name("bms");
 
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+		chg->batt_verify_psy = power_supply_get_by_name("batt_verify");
+#endif
 		if (chg->sec_pl_present) {
 			chg->pl.psy = power_supply_get_by_name("parallel");
 			if (chg->pl.psy) {

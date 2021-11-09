@@ -478,6 +478,9 @@ struct fg_dev {
 	struct power_supply	*dc_psy;
 	struct power_supply	*parallel_psy;
 	struct power_supply	*pc_port_psy;
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+	struct power_supply *max_verify_psy;
+#endif
 	struct fg_irq_info	*irqs;
 	struct votable		*awake_votable;
 	struct votable		*delta_bsoc_irq_en_votable;
