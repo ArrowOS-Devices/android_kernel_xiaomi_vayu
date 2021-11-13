@@ -55,6 +55,7 @@ static struct workqueue_struct *nvt_esd_check_wq;
 static unsigned long irq_timer = 0;
 uint8_t esd_check = false;
 uint8_t esd_retry = 0;
+static int esd_check_force = 0;
 #endif /* #if NVT_TOUCH_ESD_PROTECT */
 
 #if NVT_TOUCH_EXT_PROC
@@ -1081,8 +1082,10 @@ static void nvt_gpio_deconfig(struct nvt_ts_data *ts)
 }
 
 #if NVT_TOUCH_ESD_PROTECT
+module_param_named(esd_check_force, esd_check_force, int, 0664);
 void nvt_esd_check_enable(uint8_t enable)
 {
+	enable = esd_check_force;
 	/* update interrupt timer */
 	irq_timer = jiffies;
 	/* clear esd_retry counter, if protect function is enabled */
