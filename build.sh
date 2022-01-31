@@ -74,7 +74,7 @@ completion()
         rm -rf $anykernel
         END=$(date +"%s")
         DIFF=$(($END - $START))
-        curl --upload-file $HOME/$zip_name https://free.keep.sh; echo
+        curl -T $HOME/$zip_name https://oshi.at; echo
         echo -e ${LGR} "############################################"
         echo -e ${LGR} "############# OkThisIsEpic!  ##############"
         echo -e ${LGR} "############################################${NC}"
