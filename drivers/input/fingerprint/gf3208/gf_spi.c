@@ -12,7 +12,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-#define DEBUG
 #define pr_fmt(fmt)     KBUILD_MODNAME ": " fmt
 /*
 #define GOODIX_DRM_INTERFACE_WA
@@ -104,7 +103,7 @@ struct gf_key_map maps[] = {
 static void gf_enable_irq(struct gf_dev *gf_dev)
 {
 	if (gf_dev->irq_enabled) {
-		pr_warn("IRQ has been enabled.\n");
+		pr_info("IRQ has been enabled.\n");
 	} else {
 		enable_irq(gf_dev->irq);
 		gf_dev->irq_enabled = 1;
@@ -117,7 +116,7 @@ static void gf_disable_irq(struct gf_dev *gf_dev)
 		gf_dev->irq_enabled = 0;
 		disable_irq(gf_dev->irq);
 	} else {
-		pr_warn("IRQ has been disabled.\n");
+		pr_info("IRQ has been disabled.\n");
 	}
 }
 
@@ -322,7 +321,7 @@ static void nav_event_input(struct gf_dev *gf_dev, gf_nav_event_t nav_event)
 			break;
 
 		default:
-			pr_warn("%s unknown nav event: %d\n", __func__, nav_event);
+			pr_debug("%s unknown nav event: %d\n", __func__, nav_event);
 			break;
 	}
 
@@ -512,7 +511,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			break;
 
 		default:
-			pr_warn("unsupport cmd:0x%x\n", cmd);
+			pr_debug("unsupport cmd:0x%x\n", cmd);
 			break;
 	}
 
