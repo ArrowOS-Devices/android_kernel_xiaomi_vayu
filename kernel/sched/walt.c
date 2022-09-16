@@ -922,6 +922,11 @@ void set_window_start(struct rq *rq)
 unsigned int max_possible_efficiency = 1;
 unsigned int min_possible_efficiency = UINT_MAX;
 
+#ifdef CONFIG_SCHED_WALT
+unsigned int sysctl_sched_conservative_pl;
+unsigned int sysctl_sched_many_wakeup_threshold = 1000;
+#endif
+
 #define INC_STEP 8
 #define DEC_STEP 2
 #define CONSISTENT_THRES 16
